@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wink</title>
+<style>
+:root{
+  --bg:#f6ece8;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f0809}}
+:root[data-theme="dark"]{--bg:#0f0809}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);display:grid;place-items:center;overflow-x:hidden}
+.stage{display:block;width:min(100%,56rem);padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;border-radius:2rem}
+.stage:focus-visible{outline:3px solid #d9a181;outline-offset:2px}
+.mask{width:100%;aspect-ratio:8/5;-webkit-mask-image:radial-gradient(ellipse at center,#000 42%,transparent 72%);mask-image:radial-gradient(ellipse at center,#000 42%,transparent 72%)}
+svg{display:block;width:100%;height:100%}
+</style>
+</head>
+<body>
+<button class="stage" id="stage" aria-label="Aankh maarne ke liye tap karo">
+  <div class="mask">
+    <svg id="svg" viewBox="40 20 320 200" aria-hidden="true">
+      <defs>
+        <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7b593"/><stop offset="1" stop-color="#d9a181"/></linearGradient>
+        <radialGradient id="sc"><stop offset="0" stop-color="#fdfaf7"/><stop offset=".7" stop-color="#f1e6e0"/><stop offset="1" stop-color="#cdb3aa"/></radialGradient>
+        <radialGradient id="ir"><stop offset="0" stop-color="#2a190d"/><stop offset=".45" stop-color="#6b4220"/><stop offset=".75" stop-color="#a06a2f"/><stop offset=".92" stop-color="#5e3a1a"/><stop offset="1" stop-color="#1d1209"/></radialGradient>
+        <linearGradient id="st" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#280f08" stop-opacity=".6"/><stop offset="1" stop-color="#280f08" stop-opacity="0"/></linearGradient>
+        <radialGradient id="sock"><stop offset="0" stop-color="#824632" stop-opacity=".28"/><stop offset="1" stop-color="#824632" stop-opacity="0"/></radialGradient>
+        <radialGradient id="ub"><stop offset="0" stop-color="#8c4637" stop-opacity=".32"/><stop offset="1" stop-color="#8c4637" stop-opacity="0"/></radialGradient>
+        <radialGradient id="hl"><stop offset="0" stop-color="#ffe8d2" stop-opacity=".32"/><stop offset="1" stop-color="#ffe8d2" stop-opacity="0"/></radialGradient>
+        <filter id="bl"><feGaussianBlur stdDeviation="1.3"/></filter>
+        <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="2" seed="4"/><feColorMatrix type="saturate" values="0"/></filter>
+      </defs>
+      <rect width="400" height="240" fill="url(#skin)"/>
+      <rect width="400" height="240" filter="url(#grain)" opacity=".07" style="mix-blend-mode:multiply"/>
+      <ellipse cx="200" cy="128" rx="30" ry="78" fill="url(#hl)"/>
+      <g id="eyes"></g>
+    </svg>
+  </div>
+</button>
+
+<script>
+(function(){
+var SK = "#e1ab8a";
+var CLIP = "M-58 3 Q-30 -28 2 -30 Q34 -28 58 -2 Q32 30 0 33 Q-30 31 -58 3 Z";
+var TOP = "M-58 3 Q-30 -28 2 -30 Q34 -28 58 -2";
+var UP = "M-90 -140 L90 -140 L90 0 L80 0 Q0 12 -80 0 L-90 0 Z";
+var LO = "M-90 140 L90 140 L90 0 L80 0 Q0 12 -80 0 L-90 0 Z";
+var EDGE = "M-80 0 Q0 12 80 0";
+
+function lashesOpen(){
+  var s = "";
+  for (var i = 0; i < 15; i++){
+    var x = -56 + i*8, k = x/59;
+    var y = 2 - 32*(1 - k*k), len = 10 + (-k)*4;
+    var ex = x + k*6 - 2, ey = y - len*0.9 + Math.abs(k)*5;
+    s += '<path d="M'+x+' '+y.toFixed(1)+' Q'+(x+k-1).toFixed(1)+' '+(y-len*0.55).toFixed(1)+' '+ex.toFixed(1)+' '+ey.toFixed(1)+'"/>';
+  }
+  return s;
+}
+function lashesClosed(){
+  var s = "";
+  for (var i = 0; i < 15; i++){
+    var x = -54 + i*7.4, k = x/58, t = (x+80)/160;
+    var y = 2*(1-t)*t*12, len = 8 + (-k)*3;
+    var ex = x + k*5 - 2, ey = y + len;
+    s += '<path d="M'+x.toFixed(1)+' '+y.toFixed(1)+' Q'+(x+k-1).toFixed(1)+' '+(y+len*0.5).toFixed(1)+' '+ex.toFixed(1)+' '+ey.toFixed(1)+'"/>';
+  }
+  return s;
+}
+function fibers(){
+  var s = "";
+  for (var i = 0; i < 30; i++){
+    var a = i/30*6.283 + 0.2, r2 = 21 + ((i*7)%5);
+    s += '<line x1="'+(Math.cos(a)*12.5).toFixed(1)+'" y1="'+(Math.sin(a)*12.5).toFixed(1)+'" x2="'+(Math.cos(a)*r2).toFixed(1)+'" y2="'+(Math.sin(a)*r2).toFixed(1)+'"/>';
+  }
+  return s;
+}
+function eyeSvg(id, cx, s){
+  return '<g id="'+id+'" transform="translate('+cx+' 120)"><g transform="scale('+s+' 1)">'+
+    '<ellipse cx="0" cy="-2" rx="78" ry="52" fill="url(#sock)"/>'+
+    '<ellipse class="bag" cx="0" cy="44" rx="50" ry="11" fill="url(#ub)"/>'+
+    '<path class="crease" d="M-52 -34 Q-10 -62 54 -32" fill="none" stroke="#b57c5c" stroke-width="2" stroke-linecap="round" opacity=".5"/>'+
+    '<clipPath id="'+id+'c"><path d="'+CLIP+'"/></clipPath>'+
+    '<g clip-path="url(#'+id+'c)">'+
+      '<path d="'+CLIP+'" fill="url(#sc)"/>'+
+      '<g transform="translate(3 -1)">'+
+        '<circle r="27" fill="url(#ir)"/>'+
+        '<g stroke="#ffd296" stroke-opacity=".2" stroke-width="1">'+fibers()+'</g>'+
+        '<circle r="27" fill="none" stroke="#1d1209" stroke-width="3" opacity=".8"/>'+
+        '<circle r="11" fill="#080504"/>'+
+        '<circle cx="-8" cy="-9" r="5" fill="#fff" opacity=".92"/>'+
+        '<circle cx="9" cy="8" r="2.2" fill="#fff" opacity=".55"/>'+
+      '</g>'+
+      '<rect x="-60" y="-32" width="120" height="28" fill="url(#st)"/>'+
+      '<g class="lo"><path d="'+LO+'" fill="'+SK+'"/></g>'+
+      '<g class="up"><path d="'+UP+'" fill="'+SK+'"/><path d="'+EDGE+'" fill="none" stroke="#2a140c" stroke-width="2.4" stroke-linecap="round"/></g>'+
+    '</g>'+
+    '<path class="top" d="'+TOP+'" fill="none" stroke="#1b0e08" stroke-width="3.2" stroke-linecap="round"/>'+
+    '<g class="lashO" fill="none" stroke="#1b0e08" stroke-width="1.5" stroke-linecap="round">'+lashesOpen()+'</g>'+
+    '<g class="lashC" transform="translate(0 2)" opacity="0" fill="none" stroke="#1b0e08" stroke-width="1.5" stroke-linecap="round">'+lashesClosed()+'</g>'+
+    '<path class="brow" d="M-60 -48 Q-8 -68 58 -48" fill="none" stroke="#35200f" stroke-width="7" stroke-linecap="round" opacity=".88" filter="url(#bl)"/>'+
+  '</g></g>';
+}
+
+var host = document.getElementById("eyes");
+host.innerHTML = eyeSvg("eL", 110, 1) + eyeSvg("eR", 290, -1);
+
+function grab(id){
+  var g = document.getElementById(id), q = function(c){ return g.querySelector("."+c); };
+  return {g:g, up:q("up"), lo:q("lo"), crease:q("crease"), bag:q("bag"), brow:q("brow"), top:q("top"), lashO:q("lashO"), lashC:q("lashC")};
+}
+var L = grab("eL"), R = grab("eR");
+function ty(el, v){ el.setAttribute("transform", "translate(0 "+v.toFixed(2)+")"); }
+function clamp(v){ return Math.max(0, Math.min(1, v)); }
+
+function apply(c){
+  // right eye (the one that winks)
+  R.g.setAttribute("transform", "translate(290 "+(120 - 2*c).toFixed(2)+")");
+  ty(R.up, -52 + 54*c);
+  ty(R.lo, 50 - 48*c);
+  ty(R.crease, 13*c);
+  ty(R.brow, 9*c);
+  R.bag.setAttribute("opacity", (0.5 + 0.5*c).toFixed(2));
+  ty(R.bag, -5*c);
+  var o = clamp(1 - c*2.5);
+  R.top.setAttribute("opacity", o); R.lashO.setAttribute("opacity", o);
+  R.lashC.setAttribute("opacity", clamp((c - 0.55)/0.45));
+  // left eye: only a faint squint
+  L.g.setAttribute("transform", "translate(110 "+(120 - 0.4*c).toFixed(2)+")");
+  ty(L.up, -52 + 22*c);
+  ty(L.lo, 50 - 22*c);
+  ty(L.crease, 3*c);
+  ty(L.brow, 2*c);
+  L.bag.setAttribute("opacity", (0.5 + 0.15*c).toFixed(2));
+}
+apply(0);
+
+function ease(x){ return x < 0.5 ? 4*x*x*x : 1 - Math.pow(-2*x + 2, 3)/2; }
+var t0 = 0, busy = false;
+function frame(now){
+  var e = Math.max(0, now - t0), v;
+  if (e < 150) v = ease(e/150);
+  else if (e < 600) v = 1;
+  else if (e < 900) v = 1 - ease((e - 600)/300);
+  else { apply(0); busy = false; return; }
+  apply(v);
+  requestAnimationFrame(frame);
+}
+function wink(){
+  if (busy) return;
+  busy = true; t0 = performance.now();
+  requestAnimationFrame(frame);
+}
+document.getElementById("stage").addEventListener("click", wink);
+setTimeout(wink, 1000);
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) setInterval(wink, 3600);
+})();
+</script>
+</body>
+</html>
